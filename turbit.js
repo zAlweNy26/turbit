@@ -18,7 +18,15 @@
  * Last update: August 2, 2024
  *
  */
-if (typeof process === "undefined" || !process.versions || !process.versions.node) {
+
+const process = (globalThis.process || Object.create(null));
+
+const isNode = globalThis.process?.release?.name === "node";
+const isBun = !!globalThis.Bun || !!globalThis.process?.versions?.bun;
+const isDeno = !!globalThis.Deno;
+const isBrowser = !isNode && !isBun && !isDeno;
+
+if (typeof process === "undefined" || isBrowser) {
     console.error("Turbit is developed for Node.js and does not support browsers.");
 } else {
     const childProcess = require("child_process");
@@ -166,7 +174,7 @@ if (typeof process === "undefined" || !process.versions || !process.versions.nod
                     for (let i = 0; i < data.length; i += chunkSize) {
                         dataChunks.push(data.slice(i, i + chunkSize));
                     }
-                    
+
                     const tasks = dataChunks.map(chunk => ({
                         func,
                         args: Object.keys(args).length ? { data: chunk, args } : [chunk]
@@ -210,7 +218,7 @@ if (typeof process === "undefined" || !process.versions || !process.versions.nod
                   *   - Distributes the provided `data` across multiple processes for parallel processing, with the degree of parallelism customized through the `power` option.
                   *   - The `data` option must be an array of items, which will be processed in chunks across the spawned processes.
                   *
-                  * 
+                  *
                   * @example
                   * // Example usage for simple execution with parallel processing
                   * function simpleTask() {
@@ -218,7 +226,7 @@ if (typeof process === "undefined" || !process.versions || !process.versions.nod
                   *   return "Simple task completed";
                   * }
                   *
-                  * 
+                  *
                   * turbit.run(simpleTask, { type: "simple", power: 100 })
                   *   .then(result => console.log("Simple execution result:", result))
                   *   .catch(error => console.error("Error in simple execution:", error));
@@ -229,7 +237,7 @@ if (typeof process === "undefined" || !process.versions || !process.versions.nod
                   *   return item * 2;
                   * }
                   *
-                  * 
+                  *
                   * turbit.run(exampleFunction, {
                   *   type: "extended",
                   *   data: [1, 2, 3, 4], // Data to be processed in parallel
