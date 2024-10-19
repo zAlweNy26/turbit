@@ -29,7 +29,7 @@ declare function Turbit(): {
      * @param options.args The arguments to be passed to the function. Optional for the "extended" type execution to provide
      * extra arguments to the function.
      * @param options.power The processing power to use, as a percentage of total available CPU cores. Determines the number
-     * of child processes spawned for both "simple" and "extended" type execution.
+     * of child processes spawned for both "simple" and "extended" type execution. Default to 70%.
      * @returns The result of the execution, including any data processed and statistics about the execution, such as time
      * taken and memory used.
      *
@@ -72,7 +72,7 @@ declare function Turbit(): {
      * execution type are not provided or are invalid.
      */
     run: <F extends (...args: any[]) => any>(func: F, options: RunOptions<Parameters<F>>) => Promise<{
-        data: ReturnType<F>[];
+        data: Awaited<ReturnType<F>>[];
         stats: {
             timeTakenSeconds: number;
             numProcessesUsed: number;
